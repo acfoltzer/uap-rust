@@ -40,17 +40,17 @@ impl UserAgentParser {
     pub fn parse(&self, agent: String) -> Option<UserAgent> {
         self.regex.captures(&agent[..]).map(|c| {
             let family = self.family.clone()
-                .and_then(|f| c.at(1).map(|a| f.replace("$1", a)))
-                .unwrap_or(c.at(1).unwrap_or("Other").to_string());
+                .and_then(|f| c.get(1).map(|a| f.replace("$1", a.as_str())))
+                .unwrap_or(c.get(1).map(|m| m.as_str()).unwrap_or("Other").to_owned());
             let major = self.major.clone()
-                .and_then(|f| c.at(2).map(|a| f.replace("$2", a)))
-                .or(c.at(2).map(String::from));
+                .and_then(|f| c.get(2).map(|a| f.replace("$2", a.as_str())))
+                .or(c.get(2).map(|m| m.as_str().to_owned()));
             let minor = self.minor.clone()
-                .and_then(|f| c.at(3).map(|a| f.replace("$3", a)))
-                .or(c.at(3).map(String::from));
+                .and_then(|f| c.get(3).map(|a| f.replace("$3", a.as_str())))
+                .or(c.get(3).map(|m| m.as_str().to_owned()));
             let patch = self.patch.clone()
-                .and_then(|f| c.at(4).map(|a| f.replace("$4", a)))
-                .or(c.at(4).map(String::from));
+                .and_then(|f| c.get(4).map(|a| f.replace("$4", a.as_str())))
+                .or(c.get(4).map(|m| m.as_str().to_owned()));
 
             UserAgent {
                 family: family,

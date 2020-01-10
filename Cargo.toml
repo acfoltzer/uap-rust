@@ -13,4 +13,4 @@ keywords = ["user", "agent"]
 
 [dependencies]
 yaml-rust = "0.3"
-regex = "0.1"
+regex = "1.3"

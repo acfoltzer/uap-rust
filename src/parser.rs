@@ -24,7 +24,7 @@ impl Parser {
     ///See [uap-core](https://github.com/ua-parser/uap-core/) documentation for information on the
     ///file format.
     pub fn from_file(regexes_file: &str) -> Result<Parser> {
-        let mut file = try!(File::open(regexes_file));
+        let mut file = File::open(regexes_file)?;
         let mut yaml = String::new();
         let _ = file.read_to_string(&mut yaml);
         Parser::from_str(&yaml)
@@ -36,7 +36,7 @@ impl Parser {
     ///format.
     pub fn from_str(s: &str) -> Result<Parser> {
         //Parse the yaml.
-        let docs = try!(YamlLoader::load_from_str(&s));
+        let docs = YamlLoader::load_from_str(&s)?;
         let p = Parser {
             devices_regex: yaml::from_map(&docs[0],"device_parsers")
                 .map(|y| yaml::filter_map_over_arr(y, DeviceParser::from_yaml)).unwrap(),

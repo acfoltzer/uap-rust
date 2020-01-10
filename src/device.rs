@@ -42,22 +42,34 @@ impl DeviceParser {
             })
     }
     fn replace(captures: &Captures, s: String) -> String {
-        captures.iter().zip((0..captures.len()))
-            .fold(s, |a, (c, i)| a.replace(&format!("${}", i)[..], c.unwrap_or("")))
-            .trim().to_string()
+        captures
+            .iter()
+            .zip(0..captures.len())
+            .fold(s, |a, (c, i)| {
+                let s = c.map(|m| m.as_str()).unwrap_or("");
+                a.replace(&format!("${}", i)[..], s)
+            })
+            .trim()
+            .to_string()
     }
 
     pub fn parse(&self, agent: String) -> Option<Device> {
         self.regex.captures(&agent[..]).map(|c| {
-            let family = self.family.clone()
+            let family = self
+                .family
+                .clone()
                 .map(|f| DeviceParser::replace(&c, f))
-                .unwrap_or(c.at(1).unwrap_or("Other").to_string());
-            let brand = self.brand.clone()
+                .unwrap_or(c.get(1).map(|m| m.as_str()).unwrap_or("Other").to_owned());
+            let brand = self
+                .brand
+                .clone()
                 .map(|f| DeviceParser::replace(&c, f))
-                .or(c.at(1).map(|s| s.to_string()));
-            let model = self.model.clone()
+                .or(c.get(1).map(|s| s.as_str().to_owned()));
+            let model = self
+                .model
+                .clone()
                 .map(|f| DeviceParser::replace(&c, f))
-                .or(c.at(1).map(|s| s.to_string()));
+                .or(c.get(1).map(|s| s.as_str().to_owned()));
             Device {
                 family: family,
                 brand: brand,
